@@ -2,6 +2,9 @@
 
 Please include a summary of the changes and the related issue. Please also include relevant motivation and context. List any dependencies that are required for this change.
 
+## Link to Trello Ticket
+[Ticket](--insert_link_here)
+
 ## Type of change
 
 Delete the boxes that don't apply to this pull request and check the ones that do.
