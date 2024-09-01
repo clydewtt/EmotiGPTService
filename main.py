@@ -25,6 +25,7 @@ class LoggingMiddleware(BaseHTTPMiddleware):
             request.url.path,
             formatted_process_time,
         )
+        
         return response
 
 
