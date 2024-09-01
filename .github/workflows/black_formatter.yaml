@@ -21,6 +21,11 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Check pyproject.toml
+        run: |
+          cat pyproject.toml
+
+
       - name: Install dependencies
         run: |
           python -m venv venv
