@@ -10,11 +10,11 @@ exclude = '''
   | \.mypy_cache
   | \.tox
   | \.venv
-  | \venv
-  | \__pycache__
-  | _build
-  | buck-out
+  | venv
+  | env
   | build
   | dist
+  | __pycache__
+  | .*/site-packages/.*
 )/
 '''
