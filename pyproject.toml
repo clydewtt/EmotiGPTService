@@ -9,8 +9,9 @@ exclude = '''
   | \.hg
   | \.mypy_cache
   | \.tox
-  | .venv
-  | .__pycache__
+  | \.venv
+  | \venv
+  | \__pycache__
   | _build
   | buck-out
   | build
