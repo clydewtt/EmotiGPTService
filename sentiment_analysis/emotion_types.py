@@ -1,5 +1,7 @@
 """This class contains all the emotions specified from FaceAPI"""
+
 from enum import Enum
+
 
 class Emotions(Enum):
     NEUTRAL = "Neutral"
