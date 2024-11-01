@@ -3,12 +3,15 @@ Entry point for service
 """
 
 import time
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 import uvicorn
 from logger import logger
-
+from pydantic import BaseModel
+from emotion_types import Emotions
+from sentiment_analysis import sentiment_analysis
+from gptintegration import gpt_integration
 
 app = FastAPI()
 
@@ -26,6 +29,10 @@ class LoggingMiddleware(BaseHTTPMiddleware):
             formatted_process_time,
         )
         return response
+    
+class EmotionRequest(BaseModel):
+    user_input: str
+    emotion_response: str
 
 
 app.add_middleware(LoggingMiddleware)
@@ -43,6 +50,24 @@ app.add_middleware(
 def read_root():
     return {"message": "Connected to EmotiGPT-Service"}
 
+conversation_history = []
+
+@app.post("/chat")
+def read_chat(request:EmotionRequest):
+    user_request = request.user_input
+    emotion_response = request.emotion_response
+    if emotion_response not in Emotions:
+        raise HTTPException(status_code=404, detail=f"{emotion_response} is not an applicable emotion.")
+
+    sentiment_response = sentiment_analysis(user_request)
+
+    reply, conversation_history = gpt_integration(user_request, emotion_response, sentiment_response, conversation_history)
+    
+    print(f"User Request: {user_request}, User's physical emotion: {emotion_response}, Text sentiment analysis: {sentiment_response}")
+    print(f"Assistant: {reply}")
+
+    return {"message":reply}
+        
 
 if __name__ == "__main__":
     uvicorn.run(
