@@ -25,3 +25,5 @@ def sentiment_analysis(user_input):
         reply = chat.choices[0].message.content
         return reply
     return "Please enter text for sentiment analysis"
+
+print(sentiment_analysis("I am happy"))

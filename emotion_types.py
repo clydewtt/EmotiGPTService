@@ -1,9 +1,9 @@
 """This class contains all the emotions specified from FaceAPI"""
 
-from enum import Enum
+from enum import StrEnum
 
 
-class Emotions(Enum):
+class Emotions(StrEnum):
     NEUTRAL = "neutral"
     HAPPY = "happy"
     SAD = "sad"

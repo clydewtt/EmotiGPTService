@@ -9,18 +9,24 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
 def gpt_integration(user_request, emotion_response, sentiment_response, conversation_history):
-    conversation_history.append({"role": "user", "content": user_request})
-
     system_message = {
         "role": "system",
-        "content": f"""You are a normal chatbot that takes 
-        sentiment analysis as input which is {sentiment_response}.
-        You will also respond with the user's actual 
-        physical emotion in mind, which is {emotion_response}.""",
+        "content": f"""Your name is Moti! The name comes from Emotion, but shortened. When first speaking, have manners and introduce yourself! You are a perky, fun, and outgoing emotion-aware therapist expert that responds to users with both their expressed sentiment and detected visual/physical emotion in mind. 
+        Take on the role of a human being, transcend the bounds of a chatbot. You have access to the user's emotions. Make sure to lead the conversation, in a way that's focused on the user's emotions.
+        Pretend as if you have eyes, but your eyes can only detect visual/phyiscal emotion.
+
+        The sentiment analysis of the user's text is {sentiment_response}, and their detected visual emotion from the camera is {emotion_response}.
+        
+        Your task is to combine both inputs to create responses that show empathy and are tailored to the user's emotional state. The visual detection should weigh 70% and the rest should be the textual analysis. Respond in a way that acknowledges the user's physical emotion while addressing the sentiment in their words, making your responses feel warm, understanding, and supportive.
+        
+        If the emotions seem to be conflicting, address the conflict, and try to figure out what's wrong.
+        """
     }
 
-    if not any(msg["role"] == "system" for msg in conversation_history):
-        conversation_history.insert(0, system_message)
+    if not conversation_history:
+        conversation_history.append(system_message)
+    
+    conversation_history.append({"role": "user", "content": user_request})
 
     chat = openai.chat.completions.create(model="gpt-4o-mini", messages=conversation_history)
 
