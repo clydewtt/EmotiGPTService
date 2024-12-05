@@ -12,6 +12,8 @@ from logger import logger
 from emotion_types import Emotions
 from sentiment_analysis import sentiment_analysis
 from gptintegration import gpt_integration
+from firebase.firebase import db
+from firebase.collections import Collection
 
 app = FastAPI()
 
@@ -52,18 +54,56 @@ def read_root():
     return {"message": "Connected to EmotiGPT-Service"}
 
 
+@app.put("/conversations/update/{conversation_id}")
+def update_conversation(conversation_id: str, message: dict):
+    conversation_doc = db.collection(Collection.CONVERSATIONS).document(conversation_id).get()
+
+    if not conversation_doc.exists:
+        raise HTTPException(status_code=404, detail=f"Conversation {conversation_id} not found")
+
+    current_messages = conversation_doc.to_dict().get("messages", [])
+
+    current_messages.append(message)
+
+
+@app.get("/conversations/{user_id}")
+def get_user_conversations(user_id: str):
+    conversations = []
+    conversations_ref = db.collection(Collection.CONVERSATIONS)
+    user_doc = db.collection(Collection.USERS).document(user_id).get()
+
+    if not user_doc.exists:
+        raise HTTPException(status_code=404, detail=f"User {user_id} not found")
+
+    conversation_ids = user_doc.to_dict().get("conversation_ids", [])
+
+    for conversation_id in conversation_ids:
+        conversation = conversations_ref.document(conversation_id).get().to_dict()
+
+        if conversation.exists:
+            conversations.append(conversation)
+
+    return {"user_id": user_id, "conversations": conversations}
+
+
+conversation_history = []
+
+
 @app.post("/chat")
 def read_chat(request: EmotionRequest):
+    global conversation_history
+    global conversation_history
     user_request = request.user_input
     emotion_response = request.emotion_response
-    if emotion_response not in Emotions:
+
+    if emotion_response not in Emotions.__members__.values():
         raise HTTPException(
             status_code=404, detail=f"{emotion_response} is not an applicable emotion."
         )
-    conversation_history = []
+
     sentiment_response = sentiment_analysis(user_request)
 
-    reply, conversations = gpt_integration(
+    reply, conversation_history = gpt_integration(
         user_request, emotion_response, sentiment_response, conversation_history
     )
 
@@ -74,7 +114,8 @@ def read_chat(request: EmotionRequest):
     )
     print(f"Assistant: {reply}")
 
-    return {"message": reply}, conversations
+    return {"message": reply}
+    return {"message": reply}
 
 
 if __name__ == "__main__":
